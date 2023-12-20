@@ -38,7 +38,7 @@ class Moons:
 
 	def get_moon_data(self, moon_name):
 		# Extract data for a specific moon
-		moon_data = self.data[self.data['name'] == moon_name
+		moon_data = self.data[self.data['name'] == moon_name]
 		return moon_data if not moon_data.empty else None
 
 	def list_moons(self):
