@@ -14,10 +14,9 @@ class Moons:
 
 	def _load_data(self):
 		# Load data from the SQLite database into a pandas DataFrame
-		conn = sqlite3.connect(self.database_name)
+		conn = "sqlite:///data/jupiter.db"
 		query = "SELECT * FROM moons"
-		self.data = pd.read_sql_query(query, conn)
-		conn.close()
+		self.data = pd.read_sql(query, conn)
 
 	def get_summary_statistics(self):
 	        # Calculate summary statistics for the dataset
