@@ -7,7 +7,9 @@ import seaborn as sns
 
 class Moons:
     def __init__(self, database_name='jupiter.db'):
-        self.database_name = database_name
+        data_folder = "data"
+	database_pat = os.path.join(data_folder,database_name)
+	self.database_name = database_name
         self._load_data()
 
     def _load_data(self):
