@@ -17,30 +17,3 @@ class Moons:
 		conn = "sqlite:///data/jupiter.db"
 		query = "SELECT * FROM moons"
 		self.data = pd.read_sql(query, conn)
-
-	def get_summary_statistics(self):
-	        # Calculate summary statistics for the dataset
-		return self.data.describe()
-
-	def get_correlation(self):
-		# Calculate correlations between variables in the dataset
-		return self.data.corr()
-
-	def plot_data(self, x, y):
-		# Plotting function to visualize the dataset
-		plt.figure(figsize=(8, 6))
-		sns.scatterplot(data=self.data, x=x, y=y)
-		plt.title(f"Scatter plot of {y} against {x}")
-		plt.xlabel(x)
-		plt.ylabel(y)
-		plt.show()
-
-	def get_moon_data(self, moon_name):
-		# Extract data for a specific moon
-		moon_data = self.data[self.data['name'] == moon_name]
-		return moon_data if not moon_data.empty else None
-
-	def list_moons(self):
-		# Return a list of available moon names
-		return self.data['name'].tolist()
-
