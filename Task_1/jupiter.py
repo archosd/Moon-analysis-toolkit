@@ -1,4 +1,3 @@
-# jupiter.py
 import os
 import sqlite3
 import pandas as pd
@@ -6,14 +5,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 class Moons:
-	def __init__(self, database_name='jupiter.db'):
-		data_folder = "data"
-		database_path = os.path.join(data_folder,database_name)
+	def __init__(self, database_name, database_path):
 		self.database_name = database_name
-		self._load_data()
+		self.database_path = database_path
 
-	def _load_data(self):
+	def load_all_data(self):
 		# Load data from the SQLite database into a pandas DataFrame
-		conn = "sqlite:///data/jupiter.db"
+		conn = f"sqlite:///{self.database_path}{self.database_name}"
 		query = "SELECT * FROM moons"
-		self.data = pd.read_sql(query, conn)
+		return pd.read_sql(query, conn)
+
