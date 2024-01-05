@@ -5,7 +5,7 @@ from scipy import stats
 
 
 class Moons:
-	def __init__(self, database_name, database_path, data="none"):
+	def __init__(self, database_name, database_path = ""):
 		"""
 		Initialize Moons class.
 
@@ -39,6 +39,15 @@ class Moons:
 		conn = f"sqlite:///{self.database_path}{self.database_name}"
 		query = "SELECT * FROM moons WHERE moon = ?"  # Must use a parameterized query for some reason
 		return pd.read_sql_query(query, conn, params=(name,))
+
+	def group(self, group= "Galilean"):
+		"""
+		Return data for specific group of moons
+
+		Args:
+		-group: name of the group
+		"""
+		return self.data.loc[self.data["group"] == group]
 
 	def summary(self):
 		"""
