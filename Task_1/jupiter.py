@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
+import numpy as np
 
 
 class Moons:
@@ -132,9 +133,10 @@ class Moons:
 		plt.grid(True)
 		plt.show()
 
+
 	def plot_with_regression(self, x_column, y_column, log_x=False, log_y=False):
 		"""
-		Plot a scatter plot with linear regression line.
+		Plot a scatter plot with linear regression line and optional logarithmic scaling.
 
 		Args:
 		- x_column: Name of the column for x-axis
@@ -144,19 +146,26 @@ class Moons:
 		"""
 		plt.figure(figsize=(8, 6))
 
-		plt.scatter(self.data[x_column], self.data[y_column], marker='o')
-
-		if log_x:
-			plt.xscale('log')
-		if log_y:
-			plt.yscale('log')
 		x = self.data[x_column]
 		y = self.data[y_column]
+
+		if log_x:
+			x = np.log10(x)
+		if log_y:
+			y = np.log10(y)
+
+		plt.scatter(x.dropna(), y.dropna(), marker='o')  # Drop NaN values before plotting
+
+		x = x.dropna()
+		y = y.dropna()
 
 		slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
 		line = f'Linear Regression: y = {slope:.2f}x + {intercept:.2f}'
 
-		plt.plot(x, slope * x + intercept, color='red', label=line)
+		x_range = np.linspace(x.min(), x.max(), 100)
+		regression_line = slope * x_range + intercept
+
+		plt.plot(x_range, regression_line, color='red', label=line)
 
 		plt.title(f'Scatter Plot with Linear Regression: {x_column} vs {y_column}')
 		plt.xlabel(x_column)
@@ -164,3 +173,4 @@ class Moons:
 		plt.legend()
 		plt.grid(True)
 		plt.show()
+
