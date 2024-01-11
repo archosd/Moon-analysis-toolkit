@@ -174,3 +174,28 @@ class Moons:
 		plt.grid(True)
 		plt.show()
 
+	def convert_distance(self, original_suffix, column):
+		if original_suffix =="km":
+			new_column_name = column[:-2]+"m"
+			self.data[new_column_name] = self.data[column] * 1000
+		elif original_suffix =="Mm":
+			new_column_name = column[:-2]+"m"
+			self.data["distance_m"] = self.data[column] * 1000000
+		else:
+			return "This conversion must be done manually with pandas."
+
+	def convert_time(self, original_suffix, column):
+		if original_suffix =="years":
+			new_column_name = column[:-5]+"s"
+			self.data[new_column_name] = self.data[column] * 31556952
+		elif original_suffix =="days":
+			new_column_name = column[:-4]+"s"
+			self.data[new_column_name] = self.data[column] * 86400
+		elif original_suffix == "hours":
+			new_column_name = column[:-5]+"s"
+			self.data[new_column_name] = self.data[column] * 3600
+		else:
+			return "This conversion must be done manually with pandas."
+
+	def gen_sma(self, sma_column, distance_column, ecc_column):
+		self.data[sma_column] = self.data[distance_column] * 1/(1-self.data[ecc_column])
