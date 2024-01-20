@@ -5,6 +5,8 @@ from scipy import stats
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from seaborn import pairplot
+from sklearn.metrics import r2_score, mean_squared_error
 
 
 class Moons:
@@ -202,16 +204,21 @@ class Moons:
 	def gen_sma(self, sma_column, distance_column, ecc_column):
 		self.data[sma_column] = self.data[distance_column] * 1/(1-self.data[ecc_column])
 
-	def prepare_data(self, time_column, semi_major_axis):
-		self.data['T_squared'] = self.data[time_column]
-		self.data['a_cubed'] = self.data[semi_major_axis]
-	def test_train(self,time_column = "T_squared", axis_column = "a_cubed"):
-		x = self.data[time_column]
-		y = self.data[axis_column]
-		x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.2, random_state = 42)
+	def prepare_data(self, time_column, semi_major_axis, prepared_time = "T_squared", prepared_distance = "a_cubed"):
+		self.data['T_squared'] = self.data[time_column]**2
+		self.data['a_cubed'] = self.data[semi_major_axis]**3
+	def test_train(self,time_column = "T_squared", axis_column = "a_cubed", test_size = 0.3, random_state = 42):
+
+		x = self.data[[time_column]]
+		y = self.data[[axis_column]]
+		x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=test_size, random_state = random_state)
 
 		self.model = LinearRegression()
 		self.model.fit(x_train, y_train)
+		prediction = self.model.predict(x_test)
 
-		test_score = self.model.score(x_test, y_test)
-		print(f"R-squared value on the test set: {test_score}")
+		print(f" r2_Score: {r2_score(y_test, prediction)}")
+		print(f"mean squared error: {mean_squared_error(y_test,prediction)}")
+		print("Line gradient from model: ", self.model.coef_[0])
+
+
