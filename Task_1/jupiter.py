@@ -249,10 +249,10 @@ class Moons:
 
 	def estimate_planet_mass(self):
 		if self.model is None:
-			print("Model not trained. Call train_test_model() first.")
+			print("Model not trained. Call train_test() first.")
 			return
 
 		slope = self.model.coef_[0]
 		G = 6.67430e-11
-		mass_of_jupiter = (4 * np.pi**2 * slope) / G
-		print(f"Estimated mass of Jupiter: {mass_of_jupiter:.2e} kg")
+		mass_of_planet = (4 * np.pi**2) / (G*slope)
+		print(f"Estimated mass of Planet: {mass_of_planet} kg")
