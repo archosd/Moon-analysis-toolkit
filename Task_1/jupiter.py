@@ -110,7 +110,7 @@ class Moons:
 		plt.grid(True)
 		plt.show()
 
-	def plot_scatter(self, x_column, y_column, log_x=False, log_y=False):
+	def plot_scatter(self, y_column, x_column, log_x=False, log_y=False):
 		"""
 		Plot a scatter plot between x_column and y_column.
 
@@ -138,7 +138,7 @@ class Moons:
 		plt.show()
 
 
-	def plot_with_regression(self, x_column, y_column, log_x=False, log_y=False):
+	def plot_with_regression(self, y_column, x_column, log_x=False, log_y=False):
 		"""
 		Plot a scatter plot with linear regression line and optional logarithmic scaling.
 
@@ -207,18 +207,52 @@ class Moons:
 	def prepare_data(self, time_column, semi_major_axis, prepared_time = "T_squared", prepared_distance = "a_cubed"):
 		self.data['T_squared'] = self.data[time_column]**2
 		self.data['a_cubed'] = self.data[semi_major_axis]**3
-	def test_train(self,time_column = "T_squared", axis_column = "a_cubed", test_size = 0.3, random_state = 42):
+	def test_train(self,time_column = "T_squared", axis_column = "a_cubed", test_size = 0.3, random_state = 42, predicted_gradient = 1):
 
-		x = self.data[[time_column]]
-		y = self.data[[axis_column]]
+		y = self.data[[time_column]]
+		x = self.data[[axis_column]]
 		x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=test_size, random_state = random_state)
 
 		self.model = LinearRegression()
 		self.model.fit(x_train, y_train)
 		prediction = self.model.predict(x_test)
 
+		residuals = y_test - prediction
+
+		# Create subplots
+		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+		# Scatter plot
+		ax1.scatter(x_test, y_test, label='Actual')
+		ax1.scatter(x_test, prediction, label='Predicted', color='red')
+		ax1.set_xlabel('Semi major axis cubed')
+		ax1.set_ylabel('Orbital period squared')
+		ax1.set_title('Scatter Plot of T^2 and a^3')
+		ax1.legend()
+
+		# Residual plot
+		ax2.scatter(x_test, residuals)
+		ax2.axhline(y=0, color='r', linestyle='--', linewidth=2)
+		ax2.set_xlabel('Semi major axis cubed')
+		ax2.set_ylabel('Residuals')
+		ax2.set_title('Residual Plot')
+
+		plt.tight_layout()
+		plt.show()
+
+		predicted_gradient = self.model.coef_[0]
+
 		print(f" r2_Score: {r2_score(y_test, prediction)}")
 		print(f"mean squared error: {mean_squared_error(y_test,prediction)}")
-		print("Line gradient from model: ", self.model.coef_[0])
+		print("Line gradient from model: ", predicted_gradient)
 
 
+	def estimate_planet_mass(self):
+		if self.model is None:
+			print("Model not trained. Call train_test_model() first.")
+			return
+
+		slope = self.model.coef_[0]
+		G = 6.67430e-11
+		mass_of_jupiter = (4 * np.pi**2 * slope) / G
+		print(f"Estimated mass of Jupiter: {mass_of_jupiter:.2e} kg")
