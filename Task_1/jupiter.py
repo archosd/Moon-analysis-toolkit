@@ -174,9 +174,10 @@ class Moons:
 		plt.title(f'Scatter Plot with Linear Regression: {x_column} vs {y_column}')
 		plt.xlabel(x_column)
 		plt.ylabel(y_column)
-		plt.legend()
 		plt.grid(True)
 		plt.show()
+
+		print(f"r_value = {r_value}, slope = {slope}, intercept = {intercept}")
 
 	def convert_distance(self, original_suffix, column):
 		"""
@@ -215,7 +216,7 @@ class Moons:
 		else:
 			return "This conversion must be done manually with pandas."
 
-	def gen_sma(self, sma_column="semi_major_axis", distance_column, ecc_column):
+	def gen_sma(self,distance_column, ecc_column, sma_column = "semi_major_axis"):
 		"""
 		Return column added to input dataframe of calculated sma.
 
