@@ -71,7 +71,7 @@ class Moons:
 
 	def correlation(self, variable_1="", variable_2="", correlation=0):
 		"""
-		Calculate correlation between two variables in the dataset.
+		Return correlation between two variables in the dataset.
 
 		Args:
 		- variable_1: Name of the first variable
@@ -85,7 +85,7 @@ class Moons:
 
 	def detect_missing_values(self):
 		"""
-		Detects missing values in each column of the DataFrame.
+		Return any missing values in each column of the DataFrame.
 
 		Returns:
 		- DataFrame showing count and percentage of missing values for each column
@@ -97,7 +97,7 @@ class Moons:
 
 	def plot_histogram(self, column_name):
 		"""
-		Plot a histogram of the specified column.
+		Return a histogram of the specified column.
 
 		Args:
 		- column_name: Name of the column to plot
@@ -112,7 +112,7 @@ class Moons:
 
 	def plot_scatter(self, y_column, x_column, log_x=False, log_y=False):
 		"""
-		Plot a scatter plot between x_column and y_column.
+		Return a scatter plot between x_column and y_column, x and y can optionally be logged.
 
 		Args:
 		- x_column: Name of the column for x-axis
@@ -140,7 +140,7 @@ class Moons:
 
 	def plot_with_regression(self, y_column, x_column, log_x=False, log_y=False):
 		"""
-		Plot a scatter plot with linear regression line and optional logarithmic scaling.
+		Return a scatter plot with linear regression line and optional logarithmic scaling.
 
 		Args:
 		- x_column: Name of the column for x-axis
@@ -179,6 +179,13 @@ class Moons:
 		plt.show()
 
 	def convert_distance(self, original_suffix, column):
+		"""
+		Return converted distance from given suffix to SI units. Added as a column to the original dataframe.
+
+		Args:
+		-original_suffix: Suffix of the data to be converted.
+		-column: Column of data to be converted.
+		"""
 		if original_suffix =="km":
 			new_column_name = column[:-2]+"m"
 			self.data[new_column_name] = self.data[column] * 1000
@@ -189,6 +196,13 @@ class Moons:
 			return "This conversion must be done manually with pandas."
 
 	def convert_time(self, original_suffix, column):
+		"""
+		Return converted time from given suffix to SI units. Added as a column to the original dataframe.
+
+		Args:
+		-original_suffix: Suffix of the data to be converted.
+		-column: Column of data to be converted.
+		"""
 		if original_suffix =="years":
 			new_column_name = column[:-5]+"s"
 			self.data[new_column_name] = self.data[column] * 31556952
@@ -201,14 +215,44 @@ class Moons:
 		else:
 			return "This conversion must be done manually with pandas."
 
-	def gen_sma(self, sma_column, distance_column, ecc_column):
+	def gen_sma(self, sma_column="semi_major_axis", distance_column, ecc_column):
+		"""
+		Return column added to input dataframe of calculated sma.
+
+		Args:
+		-sma_column: column name of semi major axis column to be created. (Default=semi_major_axis)
+		-distance_column: distance from planet data.
+		-ecc_column: eccentricity of orbit from planet data.
+		"""
 		self.data[sma_column] = self.data[distance_column] * 1/(1-self.data[ecc_column])
 
-	def prepare_data(self, time_column, semi_major_axis, prepared_time = "T_squared", prepared_distance = "a_cubed"):
-		self.data['T_squared'] = self.data[time_column]**2
-		self.data['a_cubed'] = self.data[semi_major_axis]**3
-	def test_train(self,time_column = "T_squared", axis_column = "a_cubed", test_size = 0.3, random_state = 42, predicted_gradient = 1):
+	def prepare_data(self, time_column, semi_major_axis, prepared_time = "T_squared", prepared_sma = "a_cubed"):
+		"""
+		Return time squared and semi major axis cubed as coulmns added to imput dataframe.
 
+		Args:
+		-time_column: input time coulmn to be converted.
+		-semi_major_axis: input sma column to be converted(distance can be used as an approximation if no ecc available).
+		-prepared_time: name of converted time(default = "T_squared".
+		-prepared_sma: name of converted sma column(default = "a_cubed")
+		"""
+		self.data[prepared_time] = self.data[time_column]**2
+		self.data[prepared_sma] = self.data[semi_major_axis]**3
+	def test_train(self,time_column = "T_squared", axis_column = "a_cubed", test_size = 0.3, random_state = 42):
+		"""
+		Return:
+		-Plot of y_prediction against x_test on the same plot as x_test y_test.
+		-Residual plot of x_test, y_prediction
+		-r2_score
+		-mean_squared_error of y_test, prediction
+
+		Args:
+		-time_column:time input for regression model.(default = T_squared. for keplers law calculation).
+		-axis_column: sma input for regression model.(default = a_cubed. for keplers law calculation).
+		-test_size: test size of test_train data (default = 0.3)
+		-random_state: random sampling state(default = 42)
+
+		"""
 		y = self.data[[time_column]]
 		x = self.data[[axis_column]]
 		x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=test_size, random_state = random_state)
@@ -240,14 +284,14 @@ class Moons:
 		plt.tight_layout()
 		plt.show()
 
-		predicted_gradient = self.model.coef_[0]
-
 		print(f" r2_Score: {r2_score(y_test, prediction)}")
 		print(f"mean squared error: {mean_squared_error(y_test,prediction)}")
-		print("Line gradient from model: ", predicted_gradient)
 
 
 	def estimate_planet_mass(self):
+		"""
+		-Return calculated mass of planet using Kepler's law.
+		"""
 		if self.model is None:
 			print("Model not trained. Call train_test() first.")
 			return
